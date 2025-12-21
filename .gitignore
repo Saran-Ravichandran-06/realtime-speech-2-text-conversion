@@ -1,0 +1,43 @@
+
+---
+
+# 📄 `.gitignore`
+
+```gitignore
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+
+# Virtual environment
+venv/
+.env
+
+# Model files (large)
+backend/models/wav2vec/
+backend/models/punctuation/
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Node / frontend cache
+node_modules/
+
+# Audio temp files
+*.wav
+*.mp3
+*.flac
+
+# Jupyter
+.ipynb_checkpoints/

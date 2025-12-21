@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Live Speech-to-Text</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Live Speech-to-Text</h1>
+        <div class="controls">
+            <button id="startBtn"><img src="assets/icons/mic.png"> Start</button>
+            <button id="stopBtn"><img src="assets/icons/stop.png"> Stop</button>
+        </div>
+
+        <canvas id="waveform" width="600" height="70"></canvas>
+
+        <h2>Transcription</h2>
+        <textarea id="transcript" rows="10" readonly></textarea>
+        <br><br>
+        <button id="downloadBtn"><img src="assets/icons/download.png"> Download</button>
+    </div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+body {
+    margin: 0;
+    background: linear-gradient(145deg, #050505, #0d001a);
+    color: #eae0ff;
+    font-family: "Inter", sans-serif;
+}
+
+.container {
+    max-width: 850px;
+    margin: 37px auto;
+    text-align: center;
+}
+
+.logo {
+    width: 120px;
+    margin-bottom: 20px;
+}
+
+/* Controls (Start, Stop Buttons) */
+.controls {
+    margin: 20px 0;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.controls button,
+#downloadBtn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    font-size: 16px;
+    background: linear-gradient(135deg, #2b003a, #12001f);
+    color: white;
+    border: 1px solid #5b1fa6;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.25s ease;
+    box-shadow: 0 0 15px rgba(123, 0, 255, 0.15);
+}
+
+.controls button:hover,
+#downloadBtn:hover {
+    background: linear-gradient(135deg, #5b1fa6, #ff2bc2);
+    box-shadow: 0 0 20px rgba(255, 43, 194, 0.4),
+                0 0 30px rgba(91, 31, 166, 0.4);
+}
+
+.controls img,
+#downloadBtn img {
+    width: 22px;
+    height: 22px;
+}
+
+/* Waveform Box */
+#waveform {
+    width: 100%;
+    border-radius: 10px;
+    background: radial-gradient(circle at top, #1a0033, #0d001a);
+    margin-bottom: 20px;
+    border: 1px solid #5b1fa6;
+    box-shadow: inset 0 0 25px rgba(127, 76, 255, 0.25);
+}
+
+/* Transcript Area */
+#transcript {
+    width: 100%;
+    background: #12001f;
+    border: 1px solid #5b1fa6;
+    color: #f4e8ff;
+    padding: 12px;
+    font-size: 16px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    resize: none;
+    line-height: 1.5;
+    box-shadow: inset 0 0 25px rgba(127, 76, 255, 0.25);
+}
+
+/* Scrollbar Styling */
+#transcript::-webkit-scrollbar {
+    width: 8px;
+}
+
+#transcript::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #7f4cff, #ff2bc2);
+    border-radius: 10px;
+}
+
+#transcript::-webkit-scrollbar-track {
+    background: #0d001a;
+}
