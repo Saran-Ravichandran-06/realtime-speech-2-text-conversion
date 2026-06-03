@@ -7,6 +7,10 @@ def pcm16_bytes_to_np_int16(pcm_bytes: bytes) -> np.ndarray:
 def int16_to_float32(int16: np.ndarray) -> np.ndarray:
     return int16.astype(np.float32) / 32768.0
 
+def float32_to_int16(float32_audio: np.ndarray) -> np.ndarray:
+    clipped = np.clip(float32_audio, -1.0, 1.0)
+    return (clipped * 32767.0).astype(np.int16)
+
 def resample_audio(float32_audio: np.ndarray, orig_sr: int, target_sr: int) -> np.ndarray:
     if orig_sr == target_sr:
         return float32_audio

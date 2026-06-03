@@ -1,8 +1,9 @@
-import torch
+import ctranslate2
 
-print("CUDA Available:", torch.cuda.is_available())
+cuda_devices = ctranslate2.get_cuda_device_count()
 
-if torch.cuda.is_available():
-    print("Using GPU:", torch.cuda.get_device_name(0))
+print("CUDA Available:", cuda_devices > 0)
+if cuda_devices > 0:
+    print("CUDA Device Count:", cuda_devices)
 else:
-    print("Running on CPU")
+    print("Using CPU fallback")

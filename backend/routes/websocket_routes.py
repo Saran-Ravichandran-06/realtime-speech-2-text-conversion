@@ -1,68 +1,69 @@
 import asyncio
+
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from asr.vad import WebRTCVAD
-from asr.segmenter import Segmenter
-from asr.audio_utils import pcm16_bytes_to_np_int16, int16_to_float32
-from asr.wav2vec_asr import Wav2VecASR
-from config import SAMPLE_RATE
+
+from asr.streaming import TranscriptionWorker
 
 router = APIRouter()
 
-# Initialize singletons
-_vad = WebRTCVAD()
-_segmenter = Segmenter()
-_asr = Wav2VecASR()
 
 @router.websocket("/ws/audio")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     print("WebSocket client connected")
 
+    worker = TranscriptionWorker(websocket.app.state.transcriber)
+    worker.start()
+    receiver_task = asyncio.create_task(_receive_audio(websocket, worker))
+    sender_task = asyncio.create_task(_send_results(websocket, worker))
+
     try:
-        while True:
-            message = await websocket.receive()
+        done, pending = await asyncio.wait(
+            {receiver_task, sender_task},
+            return_when=asyncio.FIRST_COMPLETED,
+        )
 
-            # Handle disconnect
-            if message["type"] == "websocket.disconnect":
-                break
-
-            # Must read binary audio frames here
-            data = message.get("bytes", None)
-            if data is None:
-                continue
-
-            # Convert PCM16 bytes → int16 numpy
-            int16 = pcm16_bytes_to_np_int16(data)
-
-            # VAD
-            is_speech = _vad.is_speech(data)
-
-            # Segmenter
-            segment = _segmenter.append_frame(int16, is_speech=is_speech)
-
-            if segment is not None and segment.size > 0:
-                float32 = int16_to_float32(segment)
-
-                transcription = await asyncio.to_thread(
-                    _asr.transcribe, float32, SAMPLE_RATE
-                )
-
-                await websocket.send_json({"text": transcription})
+        for task in pending:
+            task.cancel()
+        await asyncio.gather(*pending, return_exceptions=True)
+        await asyncio.gather(*done, return_exceptions=True)
 
     except WebSocketDisconnect:
         print("WebSocket client disconnected")
 
-        seg = _segmenter.force_flush()
-        if seg is not None and seg.size > 0:
-            float32 = int16_to_float32(seg)
-            transcription = await asyncio.to_thread(
-                _asr.transcribe, float32, SAMPLE_RATE
-            )
-            print("Final transcription:", transcription)
-
-    except Exception as e:
-        print("WebSocket error:", e)
+    except Exception as exc:
+        print("WebSocket error:", exc)
 
     finally:
-        await websocket.close()
+        await worker.stop()
+        for task in (receiver_task, sender_task):
+            if not task.done():
+                task.cancel()
+        try:
+            await websocket.close()
+        except RuntimeError:
+            pass
         print("Connection closed")
+
+
+async def _receive_audio(websocket: WebSocket, worker: TranscriptionWorker) -> None:
+    while True:
+        message = await websocket.receive()
+
+        if message["type"] == "websocket.disconnect":
+            break
+
+        data = message.get("bytes")
+        if data is not None:
+            worker.enqueue_audio(data)
+
+
+async def _send_results(websocket: WebSocket, worker: TranscriptionWorker) -> None:
+    while True:
+        message = await worker.result_queue.get()
+        try:
+            if message is None:
+                return
+            await websocket.send_json(message)
+        finally:
+            worker.result_queue.task_done()
