@@ -1,28 +1,36 @@
+import asyncio
 import os
-from fastapi import APIRouter, UploadFile, File
-from asr.wav2vec_asr import Wav2VecASR
-from asr.audio_utils import int16_to_float32, resample_audio
+import tempfile
+
 import soundfile as sf
-import numpy as np
+from fastapi import APIRouter, File, Request, UploadFile
+
+from asr.audio_utils import resample_audio
 from config import SAMPLE_RATE
 
 router = APIRouter()
-_asr = Wav2VecASR()
+
 
 @router.post("/api/transcribe")
-async def transcribe_file(file: UploadFile = File(...)):
+async def transcribe_file(request: Request, file: UploadFile = File(...)):
     contents = await file.read()
-    temp_path = f"temp_{file.filename}"
-    with open(temp_path, "wb") as f:
-        f.write(contents)
 
-    # Load audio as float32
-    audio, sr = sf.read(temp_path, dtype='float32')
-    if len(audio.shape) > 1:
-        audio = audio.mean(axis=1)  # Convert to mono
+    suffix = os.path.splitext(file.filename or "")[1]
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_file:
+        temp_file.write(contents)
+        temp_path = temp_file.name
 
-    audio_resampled = resample_audio(audio, sr, SAMPLE_RATE)
-    transcription = _asr.transcribe(audio_resampled, SAMPLE_RATE)
+    try:
+        audio, sample_rate = sf.read(temp_path, dtype="float32")
+        if len(audio.shape) > 1:
+            audio = audio.mean(axis=1)
 
-    os.remove(temp_path)
-    return {"text": transcription}
+        audio_resampled = resample_audio(audio, sample_rate, SAMPLE_RATE)
+        transcription = await asyncio.to_thread(
+            request.app.state.transcriber.transcribe,
+            audio_resampled,
+            SAMPLE_RATE,
+        )
+        return {"text": transcription}
+    finally:
+        os.remove(temp_path)

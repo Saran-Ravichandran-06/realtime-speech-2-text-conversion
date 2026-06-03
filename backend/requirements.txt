@@ -10,19 +10,15 @@ webrtcvad==2.0.10
 numpy==1.26.4
 scipy==1.11.4
 
-# --- ASR Model (Wav2Vec2) ---
-torch==2.3.0
-torchaudio==2.3.0
-transformers==4.40.2
-datasets==2.19.0
-huggingface-hub==0.23.0
+# --- ASR Model (Faster-Whisper) ---
+faster-whisper==1.0.3
+ctranslate2==4.3.1
 
 # --- Utilities ---
 requests==2.31.0
 tqdm==4.66.1
 pydantic==2.7.1
 pydantic-settings==2.2.1
-pyspellchecker==0.7.0
 
 # --- Optional (for logs and dev) ---
 python-dotenv==1.0.1

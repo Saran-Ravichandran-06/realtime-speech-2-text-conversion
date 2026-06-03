@@ -1,7 +1,7 @@
 import soundfile as sf
-from asr.wav2vec_asr import Wav2VecASR
+from asr.faster_whisper_asr import FasterWhisperTranscriber
 
-asr = Wav2VecASR()
+asr = FasterWhisperTranscriber()
 
 path = "sample.wav"   # put any wav file here
 

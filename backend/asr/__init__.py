@@ -4,7 +4,9 @@
 ASR (Automatic Speech Recognition) package.
 Contains modules for:
 - WebRTC VAD
-- Wav2Vec2 inference
+- Faster-Whisper inference
+- Audio buffering
+- Optional noise suppression
 - Audio preprocessing
 - Segmentation
 """

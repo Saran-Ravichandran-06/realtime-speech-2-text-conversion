@@ -1,58 +1,61 @@
-# ⚙️ Installation & Setup Guide
+# Installation & Setup Guide
 
-This guide explains how to set up and run the **Real-Time Speech-to-Text Conversion** project locally.
+This guide explains how to run the real-time speech-to-text project locally.
 
----
+## Prerequisites
 
-## ✅ Prerequisites
-
-- Python **3.10+**
-- Node-free (pure JS frontend)
+- Python 3.10+
 - Microphone access
-- Windows / Linux / macOS
+- Windows, Linux, or macOS
+- Optional: CUDA-capable GPU for faster inference
 
----
+## Backend Setup
 
-## 📥 Clone Repository
+Create and activate a virtual environment:
 
-git clone https://github.com/Saran-Ravichandran-06/realtime-speech-2-text-conversion.git
-cd realtime-speech-2-text-conversion
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
 
----
+Install dependencies:
 
-## 🐍 Backend Setup
+```bash
+pip install -r requirements.txt
+```
 
-1. Create Virtual Environment
-- python -m venv venv
-- venv\Scripts\activate
+Faster-Whisper downloads the configured model automatically on first use. You
+can choose a model with `WHISPER_MODEL_SIZE`, for example:
 
+```bash
+set WHISPER_MODEL_SIZE=small
+```
 
-2. Install Dependencies
-- pip install -r requirements.txt
+Run the backend:
 
-3. Download Wav2Vec2 Model
-Download from Hugging Face and place inside:
-- backend/models/wav2vec/
+```bash
+cd backend
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
 
-Recommended model:
-- facebook/wav2vec2-base-960h
+The backend will be available at `http://127.0.0.1:8000`.
 
-4. Run Backend Server
-- cd backend
-- uvicorn main:app --reload --host 0.0.0.0 --port 8000
+## Optional Noise Suppression
 
+Noise suppression is disabled by default. To enable DeepFilterNet:
 
-Backend will be available at:
-- http://127.0.0.1:8000
+```bash
+set NOISE_SUPPRESSION_ENABLED=true
+set NOISE_SUPPRESSION_PROVIDER=deepfilternet
+```
 
----
+## Frontend Setup
 
-## 🌐 Frontend Setup
-1. Serve Frontend Files
-- cd frontend
-- python -m http.server 5500
+Serve the frontend files:
 
-2. Open in Browser
-- http://127.0.0.1:5500
+```bash
+cd frontend
+python -m http.server 5500
+```
 
-Allow microphone access when prompted.
+Open `http://127.0.0.1:5500` and allow microphone access when prompted.
