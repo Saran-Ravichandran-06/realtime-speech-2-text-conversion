@@ -91,9 +91,18 @@ class TranscriptionWorker:
             await self._transcribe_segment(segment)
 
     async def _transcribe_segment(self, segment) -> None:
+        import time
+        duration = len(segment) / SAMPLE_RATE
+        logger.info("Processing speech segment of duration %.2fs", duration)
+        
         audio = int16_to_float32(segment)
+        start_time = time.time()
         text = await asyncio.to_thread(self.transcriber.transcribe, audio, SAMPLE_RATE)
+        latency = time.time() - start_time
+        
         if text:
+            rtf = latency / duration if duration > 0 else 0
+            logger.info("Transcription completed in %.2fs (RTF: %.2f)", latency, rtf)
             await self._publish({"text": text})
 
     async def _publish(self, message: dict) -> None:

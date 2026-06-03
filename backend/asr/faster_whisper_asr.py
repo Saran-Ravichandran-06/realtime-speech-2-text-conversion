@@ -58,14 +58,26 @@ class FasterWhisperTranscriber:
             return ""
 
         audio = np.asarray(float32_audio, dtype=np.float32)
-        segments, _ = self.model.transcribe(
+        segments, info = self.model.transcribe(
             audio,
             language=self.language,
             beam_size=self.beam_size,
             vad_filter=False,
             condition_on_previous_text=False,
         )
-        return " ".join(segment.text.strip() for segment in segments).strip()
+        
+        logger.info("Language detection: %s (probability: %.2f)", info.language, info.language_probability)
+        
+        transcribed_text = []
+        for segment in segments:
+            text = segment.text.strip()
+            transcribed_text.append(text)
+            logger.info(
+                "Segment: '%s' | logprob: %.2f | no_speech_prob: %.2f", 
+                text, segment.avg_logprob, segment.no_speech_prob
+            )
+            
+        return " ".join(transcribed_text).strip()
 
     @staticmethod
     def _resolve_device(device: str) -> str:
