@@ -1,7 +1,8 @@
 export class WebSocketClient {
-    constructor(onTextReceived) {
+    constructor(onTextReceived, onStatusChange) {
         this.socket = null;
         this.onTextReceived = onTextReceived;
+        this.onStatusChange = onStatusChange;
     }
 
     connect() {
@@ -10,26 +11,30 @@ export class WebSocketClient {
 
         this.socket.onopen = () => {
             console.log("WebSocket connected");
+            if (this.onStatusChange) this.onStatusChange("Listening");
         };
 
         this.socket.onmessage = (event) => {
             try {
+                if (!event.data) return;
                 const data = JSON.parse(event.data);
-                if (data.text) {
-                    this.onTextReceived(data.text);
+                // Pass the whole data object to distinguish partial vs text
+                if (data && typeof data === 'object') {
+                    this.onTextReceived(data);
                 }
             } catch (e) {
-                console.error("Invalid JSON", e);
+                console.error("Invalid JSON or data structure", e);
             }
         };
 
         this.socket.onclose = () => {
             console.warn("WebSocket closed");
+            if (this.onStatusChange) this.onStatusChange("Disconnected");
         };
     }
 
     sendAudio(float32Frame) {
-        if (!this.socket || this.socket.readyState !== WebSocket.OPEN) return;
+        if (!this.isConnected()) return;
 
         // Convert Float32 → PCM16 bytes
         const pcm16 = new Int16Array(float32Frame.length);
@@ -39,6 +44,10 @@ export class WebSocketClient {
 
         // SEND RAW BYTES (Important)
         this.socket.send(pcm16.buffer);
+    }
+    
+    isConnected() {
+        return this.socket && this.socket.readyState === WebSocket.OPEN;
     }
 
     close() {
