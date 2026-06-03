@@ -2,25 +2,78 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Speech-to-Text</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Live Speech-to-Text</h1>
-        <div class="controls">
-            <button id="startBtn"><img src="assets/icons/mic.png"> Start</button>
-            <button id="stopBtn"><img src="assets/icons/stop.png"> Stop</button>
-        </div>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <h1>Live Speech-to-Text</h1>
+        </header>
 
-        <canvas id="waveform" width="600" height="70"></canvas>
+        <main class="main-content">
+            <!-- LEFT COLUMN (30%) -->
+            <aside class="sidebar">
+                
+                <section class="card controls-card">
+                    <div class="controls-header">
+                        <h2>Recording</h2>
+                        <div class="status-indicator">
+                            <span id="statusBadge" class="badge ready">🟢 Ready</span>
+                        </div>
+                    </div>
+                    <div class="controls">
+                        <button id="startBtn" class="primary-btn">Start Listening</button>
+                        <button id="stopBtn" class="secondary-btn" disabled>Stop Recording</button>
+                    </div>
+                </section>
 
-        <h2>Transcription</h2>
-        <textarea id="transcript" rows="10" readonly></textarea>
-        <br><br>
-        <button id="downloadBtn"><img src="assets/icons/download.png"> Download</button>
+                <section class="card stats-card">
+                    <h2>Record Stats</h2>
+                    <div class="stat-row">
+                        <span class="stat-label">Duration</span>
+                        <span class="stat-value" id="statDuration">00:00</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Words</span>
+                        <span class="stat-value" id="statWords">0</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Model</span>
+                        <span class="stat-value">Faster-Whisper</span>
+                    </div>
+                </section>
+
+                <section class="card activity-card">
+                    <div class="activity-header">
+                        <h2>Audio Activity</h2>
+                        <span id="activityText" class="activity-text">Waiting for speech...</span>
+                    </div>
+                    <div class="waveform-wrapper">
+                        <canvas id="waveform" width="400" height="120"></canvas>
+                    </div>
+                </section>
+
+            </aside>
+
+            <!-- RIGHT COLUMN (70%) -->
+            <section class="card transcript-card">
+                <h2>Live Transcript</h2>
+                <div class="transcript-container" id="transcriptContainer">
+                    <span id="finalText"></span><span id="partialText"></span>
+                </div>
+                <div class="action-bar">
+                    <button id="copyBtn" class="outline-btn" title="Copy Transcript">Copy</button>
+                    <button id="downloadBtn" class="outline-btn" title="Download Transcript">Download</button>
+                    <button id="clearBtn" class="outline-btn danger-text" title="Clear Transcript">Clear</button>
+                </div>
+            </section>
+        </main>
     </div>
 
-    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/app.js?v=4"></script>
 </body>
 </html>
