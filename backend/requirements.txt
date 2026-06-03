@@ -14,10 +14,6 @@ scipy==1.11.4
 faster-whisper==1.0.3
 ctranslate2==4.3.1
 
-# --- Optional Noise Suppression ---
-# DeepFilterNet is lazy-loaded only when NOISE_SUPPRESSION_ENABLED=true.
-DeepFilterNet==0.5.6
-
 # --- Utilities ---
 requests==2.31.0
 tqdm==4.66.1
